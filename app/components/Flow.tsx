@@ -8,39 +8,56 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   addEdge,
+  Connection,
+  Edge,
+  Node,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import Sidebar from './Sidebar';
 
-const initialNodes = [
-  { id: '1', position: { x: 250, y: 0 }, data: { label: 'Start Node' } },
-  { id: '2', position: { x: 100, y: 100 }, data: { label: 'Second Node' } },
-];
-
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
-
 export default function Flow() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
+    (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
 
-  const handleAddNode = () => {
-    const newNode = {
-      id: `${nodes.length + 1}`,
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
-      data: { label: `Node ${nodes.length + 1}` },
-    };
-    setNodes((nds) => [...nds, newNode]);
-  };
+  const onDragOver = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
+
+      const type = event.dataTransfer.getData('application/reactflow');
+      if (!type) return;
+
+      const bounds = (event.target as HTMLElement).getBoundingClientRect();
+      const position = {
+        x: event.clientX - bounds.left,
+        y: event.clientY - bounds.top,
+      };
+
+      const newNode: Node = {
+        id: `${+new Date()}`,
+        type,
+        position,
+        data: { label: `${type} node` },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [setNodes]
+  );
 
   return (
     <div className="flex h-[90vh] w-full">
-      <Sidebar onAddNode={handleAddNode} />
-      <div className="flex-1" style={{ height: '100%', width: '100%' }}>
+      <Sidebar />
+      <div className="flex-1 h-full" onDrop={onDrop} onDragOver={onDragOver}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
