@@ -14,6 +14,13 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import Sidebar from './Sidebar';
+import ActorNode from './nodes/ActorNode';
+import UseCaseNode from './nodes/UseCaseNode';
+
+const nodeTypes = {
+  actor: ActorNode,
+  usecase: UseCaseNode,
+};
 
 export default function Flow() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -46,7 +53,7 @@ export default function Flow() {
         id: `${+new Date()}`,
         type,
         position,
-        data: { label: `${type} node` },
+        data: { label: `${type === 'actor' ? 'Actor' : 'Use Case'}` },
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -59,6 +66,7 @@ export default function Flow() {
       <Sidebar />
       <div className="flex-1 h-full" onDrop={onDrop} onDragOver={onDragOver}>
         <ReactFlow
+          nodeTypes={nodeTypes}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
@@ -74,3 +82,4 @@ export default function Flow() {
     </div>
   );
 }
+

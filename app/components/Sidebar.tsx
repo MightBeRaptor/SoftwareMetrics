@@ -3,9 +3,8 @@
 import React from 'react';
 
 const nodeTypes = [
-  { type: 'default', label: 'Default Node' },
-  { type: 'input', label: 'Input Node' },
-  { type: 'output', label: 'Output Node' },
+  { type: 'actor', label: 'Actor' },
+  { type: 'usecase', label: 'Use Case' },
 ];
 
 export default function Sidebar() {
@@ -16,7 +15,7 @@ export default function Sidebar() {
 
   return (
     <aside className="p-4 bg-gray-900 text-white h-full w-48 flex flex-col gap-3 border-r border-gray-700">
-      <h2 className="text-lg font-semibold mb-2">Nodes</h2>
+      <h2 className="text-lg font-semibold mb-2">UML Nodes</h2>
       {nodeTypes.map((node) => (
         <div
           key={node.type}
