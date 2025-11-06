@@ -18,6 +18,7 @@ import ActorNode from './nodes/ActorNode';
 import UseCaseNode from './nodes/UseCaseNode';
 import SystemBoundaryNode from './nodes/SystemBoundaryNode';
 import LabeledEdge from './edges/LabeledEdge';
+import { generateUseCaseJSON } from './utils/exportJSON';
 
 const nodeTypes = {
   actor: ActorNode,
@@ -85,9 +86,20 @@ export default function Flow() {
     [setNodes]
   );
 
+  const handleExport = () => {
+    const json = generateUseCaseJSON(nodes, edges);
+    console.log(json);
+    const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'use_case_diagram.json';
+    a.click();
+  };
+
   return (
     <div className="flex h-[90vh] w-full">
-      <Sidebar />
+      <Sidebar onExport={handleExport} />
       <div className="flex-1 h-full" onDrop={onDrop} onDragOver={onDragOver}>
         <ReactFlow
           nodeTypes={nodeTypes}
@@ -97,12 +109,12 @@ export default function Flow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          style={{ backgroundColor: 'gray'}}
+          style={{ backgroundColor: 'gray' }}
           fitView
         >
           <MiniMap />
           <Controls />
-          <Background color='000000'/>
+          <Background color="000000" />
         </ReactFlow>
       </div>
     </div>

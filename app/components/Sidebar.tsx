@@ -1,9 +1,13 @@
 'use client';
 
 import React from 'react';
-import './Sidebar.css'; // We'll create this file next
+import './Sidebar.css';
 
-export default function Sidebar() {
+interface SidebarProps {
+  onExport?: () => void; // optional export callback
+}
+
+export default function Sidebar({ onExport }: SidebarProps) {
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
@@ -36,6 +40,12 @@ export default function Sidebar() {
       >
         System Boundary
       </div>
+
+      {onExport && (
+        <button className="sidebar-export-btn" onClick={onExport}>
+          Export JSON
+        </button>
+      )}
     </aside>
   );
 }
