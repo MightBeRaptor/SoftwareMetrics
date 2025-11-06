@@ -22,7 +22,7 @@ export default function UseCaseNode({ id, data }: NodeProps) {
   }, [data.label]);
 
   return (
-    <div className="flex items-center justify-center rounded-full border border-gray-700 bg-white w-32 h-16 text-sm text-gray-800">
+    <div className="flex items-center justify-center rounded-full border border-gray-700 bg-white w-32 h-16 text-sm text-gray-800" >
       {editing ? (
         <input
           autoFocus

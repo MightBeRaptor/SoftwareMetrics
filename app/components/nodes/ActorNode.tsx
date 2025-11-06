@@ -22,20 +22,19 @@ export default function ActorNode({ id, data }: NodeProps) {
   }, [data.label]);
 
   return (
-    <div className="flex flex-col items-center text-black">
+    <div className="flex flex-col items-center text-black bg-transparent">
       {/* Stick Figure */}
-      <div className="relative flex flex-col items-center">
-        <div className="w-6 h-6 border border-black rounded-full" />
-        <div className="w-px h-8 bg-black" />
-        <div className="flex justify-between w-10">
-          <div className="w-px h-4 bg-black rotate-45" />
-          <div className="w-px h-4 bg-black -rotate-45" />
-        </div>
-        <div className="flex justify-between w-4 mt-[-2px]">
-          <div className="w-px h-4 bg-black" />
-          <div className="w-px h-4 bg-black" />
-        </div>
-      </div>
+      <svg width="40" height="80" viewBox="0 0 40 80">
+        {/* Head */}
+        <circle cx="20" cy="10" r="8" stroke="black" fill="white" strokeWidth="1" />
+        {/* Body */}
+        <line x1="20" y1="18" x2="20" y2="45" stroke="black" strokeWidth="1" />
+        {/* Arms */}
+        <line x1="5" y1="25" x2="35" y2="25" stroke="black" strokeWidth="1" />
+        {/* Legs */}
+        <line x1="20" y1="45" x2="8" y2="70" stroke="black" strokeWidth="1" />
+        <line x1="20" y1="45" x2="32" y2="70" stroke="black" strokeWidth="1" />
+      </svg>
 
       {/* Editable Label */}
       {editing ? (

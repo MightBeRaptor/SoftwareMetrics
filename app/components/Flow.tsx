@@ -16,11 +16,13 @@ import 'reactflow/dist/style.css';
 import Sidebar from './Sidebar';
 import ActorNode from './nodes/ActorNode';
 import UseCaseNode from './nodes/UseCaseNode';
+import SystemBoundaryNode from './nodes/SystemBoundaryNode';
 import LabeledEdge from './edges/LabeledEdge';
 
 const nodeTypes = {
   actor: ActorNode,
   usecase: UseCaseNode,
+  boundary: SystemBoundaryNode,
 };
 
 const edgeTypes = {
