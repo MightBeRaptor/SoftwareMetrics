@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -14,11 +14,13 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import Sidebar from './Sidebar';
+import AISidebar from './AISidebar';
 import ActorNode from './nodes/ActorNode';
 import UseCaseNode from './nodes/UseCaseNode';
 import SystemBoundaryNode from './nodes/SystemBoundaryNode';
 import LabeledEdge from './edges/LabeledEdge';
 import { generateUseCaseJSON } from './utils/exportJSON';
+import { sendDiagramToOllama } from './utils/sendToOllama';
 
 const nodeTypes = {
   actor: ActorNode,
@@ -33,6 +35,8 @@ const edgeTypes = {
 export default function Flow() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   const onLabelChange = (id: string, label: string) => {
     setEdges((eds) =>
@@ -64,7 +68,6 @@ export default function Flow() {
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
-
       const type = event.dataTransfer.getData('application/reactflow');
       if (!type) return;
 
@@ -97,10 +100,25 @@ export default function Flow() {
     a.click();
   };
 
+  const handleSendToAI = async () => {
+    const json = generateUseCaseJSON(nodes, edges);
+    setLoading(true);
+    setAnalysis(null);
+    try {
+      const response = await sendDiagramToOllama(json);
+      const parsed = JSON.parse(response);
+      setAnalysis(parsed);
+    } catch (err) {
+      console.error('AI response error:', err);
+      setAnalysis({ error: 'Invalid or unexpected AI response' });
+    }
+    setLoading(false);
+  };
+
   return (
-    <div className="flex h-[90vh] w-full">
-      <Sidebar onExport={handleExport} />
-      <div className="flex-1 h-full" onDrop={onDrop} onDragOver={onDragOver}>
+    <div style={{ display: 'flex', height: '90vh', width: '100%' }}>
+      <Sidebar onExport={handleExport} onSendToAI={handleSendToAI} />
+      <div style={{ flex: 1, height: '100%' }} onDrop={onDrop} onDragOver={onDragOver}>
         <ReactFlow
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
@@ -109,14 +127,15 @@ export default function Flow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          style={{ backgroundColor: 'gray' }}
+          style={{ backgroundColor: 'white' }}
           fitView
         >
           <MiniMap />
           <Controls />
-          <Background color="000000" />
+          <Background/>
         </ReactFlow>
       </div>
+      <AISidebar analysis={analysis} loading={loading} />
     </div>
   );
 }
