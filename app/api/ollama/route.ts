@@ -51,16 +51,24 @@ ${JSON.stringify(diagramData)}
     // Attempt to extract JSON from AI response
     let parsed;
     try {
-      // Remove code fences, trim whitespace
+      // Remove code fences and trim whitespace
       const cleanText = text.replace(/```json|```/g, "").trim();
-      // Extract first { ... } block
-      const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("No JSON object found in AI response");
-      parsed = JSON.parse(jsonMatch[0]);
+
+      // Extract first {...} JSON object, ignoring anything after
+      const match = cleanText.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error("No JSON object found in AI response");
+
+      let jsonStr = match[0];
+
+      // Remove any trailing characters after last closing brace
+      const lastBrace = jsonStr.lastIndexOf("}");
+      if (lastBrace !== -1) jsonStr = jsonStr.slice(0, lastBrace + 1);
+
+      parsed = JSON.parse(jsonStr);
+
       if (!parsed.misuseCases) throw new Error("Missing 'misuseCases' in AI response");
     } catch (parseErr) {
       console.error("Failed to parse Ollama JSON:", parseErr);
-      // Fallback response
       parsed = {
         misuseCases: [
           {
