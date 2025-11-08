@@ -1,12 +1,14 @@
+'use client';
+
 import React from 'react';
 import './Sidebar.css';
 
 interface SidebarProps {
   onExport: () => void;
-  onSendToAI: () => void;
+  isLoading?: boolean;
 }
 
-export default function Sidebar({ onExport, onSendToAI }: SidebarProps) {
+export default function Sidebar({ onExport, isLoading = false }: SidebarProps) {
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
@@ -17,33 +19,37 @@ export default function Sidebar({ onExport, onSendToAI }: SidebarProps) {
       <h3 className="sidebar-title">Add Nodes</h3>
 
       <div
-        className="dndnode actor"
+        className="sidebar-item"
         draggable
-        onDragStart={(event) => onDragStart(event, 'actor')}
+        onDragStart={(e) => onDragStart(e, 'actor')}
       >
         Actor
       </div>
 
       <div
-        className="dndnode usecase"
+        className="sidebar-item"
         draggable
-        onDragStart={(event) => onDragStart(event, 'usecase')}
+        onDragStart={(e) => onDragStart(e, 'usecase')}
       >
         Use Case
       </div>
 
       <div
-        className="dndnode boundary"
+        className="sidebar-item"
         draggable
-        onDragStart={(event) => onDragStart(event, 'boundary')}
+        onDragStart={(e) => onDragStart(e, 'boundary')}
       >
         System Boundary
       </div>
 
-      <hr />
-
-      <button onClick={onExport} className="sidebar-btn">Export JSON</button>
-      <button onClick={onSendToAI} className="sidebar-btn">Send to AI</button>
+      <button
+        className="sidebar-button"
+        onClick={onExport}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Analyzing…' : 'Send to AI'}
+      </button>
     </aside>
   );
 }
+
