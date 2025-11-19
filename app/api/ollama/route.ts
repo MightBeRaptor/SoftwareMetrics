@@ -36,39 +36,42 @@ Here is the diagram JSON:
 ${JSON.stringify(diagramData)}
 `;
 
+    // 🟩 IMPORTANT: streaming = false so response comes back as one JSON object
     const response = await fetch("http://localhost:11434/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "gpt-oss:20b",
         prompt,
+        stream: false
       }),
     });
 
-    const text = await response.text();
-    console.log("Ollama raw response:", text);
+    const raw = await response.json();
+    console.log("Ollama raw:", raw);
 
-    // Attempt to extract JSON from AI response
+    // Ollama will return → { response: "text" }
+    const aiText = raw.response || "";
+    console.log("Ollama response text:", aiText);
+
+    // ----- JSON EXTRACTION -----
     let parsed;
     try {
-      // Remove code fences and trim whitespace
-      const cleanText = text.replace(/```json|```/g, "").trim();
+      // Remove code fences
+      const clean = aiText.replace(/```json|```/g, "").trim();
 
-      // Extract first {...} JSON object, ignoring anything after
-      const match = cleanText.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("No JSON object found in AI response");
+      // Extract JSON object
+      const match = clean.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error("No JSON detected in AI response.");
 
-      let jsonStr = match[0];
-
-      // Remove any trailing characters after last closing brace
-      const lastBrace = jsonStr.lastIndexOf("}");
-      if (lastBrace !== -1) jsonStr = jsonStr.slice(0, lastBrace + 1);
+      const jsonStr = match[0];
 
       parsed = JSON.parse(jsonStr);
 
-      if (!parsed.misuseCases) throw new Error("Missing 'misuseCases' in AI response");
-    } catch (parseErr) {
-      console.error("Failed to parse Ollama JSON:", parseErr);
+      if (!parsed.misuseCases)
+        throw new Error("AI response missing misuseCases.");
+    } catch (err) {
+      console.error("JSON parse failed:", err);
       parsed = {
         misuseCases: [
           {
@@ -84,21 +87,24 @@ ${JSON.stringify(diagramData)}
     }
 
     return NextResponse.json({ output: parsed });
+
   } catch (error) {
     console.error("API error:", error);
     return NextResponse.json(
-      { output: {
-        misuseCases: [
-          {
-            relatedUseCase: "N/A",
-            threatType: "Error",
-            cwe: "N/A",
-            capec: "N/A",
-            description: error || "Failed to connect to Ollama",
-            mitigations: [],
-          },
-        ],
-      } },
+      {
+        output: {
+          misuseCases: [
+            {
+              relatedUseCase: "N/A",
+              threatType: "Error",
+              cwe: "N/A",
+              capec: "N/A",
+              description: String(error),
+              mitigations: [],
+            },
+          ],
+        },
+      },
       { status: 500 }
     );
   }
