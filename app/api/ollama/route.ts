@@ -41,7 +41,7 @@ ${JSON.stringify(diagramData)}
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-oss:20b",
+        model: "gpt-oss:20b", // Change this to your desired model (assuming you have it installed)
         prompt,
         stream: false
       }),

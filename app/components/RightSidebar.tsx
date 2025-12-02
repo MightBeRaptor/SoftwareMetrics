@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { downloadJSON } from "@/app/components/utils/downloadJSON";
+import './Sidebar.css';
 
 interface MisuseCase {
   relatedUseCase: string;
@@ -28,6 +30,13 @@ export default function RightSidebar({ aiResponse, isLoading }: RightSidebarProp
         overflowY: 'auto',
       }}
     >
+      
+      {aiResponse && (
+        <button onClick={() => downloadJSON(aiResponse)} className="sidebar-button">
+          Download JSON
+        </button>
+      )}
+
       <h3>AI Analysis</h3>
 
       {isLoading ? (
