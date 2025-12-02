@@ -36,7 +36,7 @@ Here is the diagram JSON:
 ${JSON.stringify(diagramData)}
 `;
 
-    // 🟩 IMPORTANT: streaming = false so response comes back as one JSON object
+    // IMPORTANT: streaming = false so response comes back as one JSON object
     const response = await fetch("http://localhost:11434/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
